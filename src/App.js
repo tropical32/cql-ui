@@ -7,43 +7,38 @@ import SaveButton from "./components/SaveButton.js";
 import DiscardButton from "./components/DiscardButton.js";
 import AddButton from "./components/AddButton.js";
 
+import { get_default_type_value } from "./utils.js";
+
 import logo from "./logo.svg";
 import "./App.css";
-
-function get_default_type_value(type) {
-  switch (type) {
-    case "varint":
-    case "tinyint":
-    case "smallint":
-    case "int":
-    case "bigint":
-    case "decimal":
-      return 0;
-    case "timestamp":
-    case "date":
-      return new Date().toISOString();
-    case "float":
-    case "double":
-      return 0.0;
-    case "text":
-      return "";
-  }
-}
 
 function App() {
   let row_counter = useRef(0);
   let [table_name, set_table_name] = useState("");
   let [tables, set_tables] = useState([]);
   let [table_data, set_table_data] = useState({});
+  let [table_data_shadow, set_table_data_shadow] = useState({});
   let [table_info, set_table_info] = useState({});
   let [error, set_error] = useState(null);
   let [add_rows, set_add_rows] = useState({});
   let [rows_to_delete, set_rows_to_delete] = useState([]);
-  let [rows_to_update, set_rows_to_update] = useState([]);
 
   let axios_instance = axios.create({
     baseURL: "http://127.0.0.1:7777",
   });
+
+  function copy_shadow_rows_to_rows() {
+    set_table_data(structuredClone(table_data_shadow));
+  }
+
+  function update_table_entry(key, column, value) {
+    set_table_data(curr_table_data => {
+      let next_table_data = { ...curr_table_data };
+      next_table_data[key][column] = value;
+
+      return next_table_data;
+    });
+  }
 
   function increase_add_row_counter() {
     row_counter.current += 1;
@@ -88,6 +83,7 @@ function App() {
         );
 
         set_table_data(ordered_table_data);
+        set_table_data_shadow(structuredClone(ordered_table_data));
         set_error(null);
       })
       .catch((error) => {
@@ -125,9 +121,9 @@ function App() {
       <TableSelector
         tables={tables}
         onChange={(event) => {
-          set_table_data([]);
+          set_table_data({});
+          set_table_data_shadow({});
           set_rows_to_delete([]);
-          set_rows_to_update([]);
           set_table_name("");
           set_table_info({});
           set_add_rows([]);
@@ -145,19 +141,21 @@ function App() {
       <DiscardButton 
         onDiscardChanges={() => {
           set_rows_to_delete([]);
-          set_rows_to_update([]);
           set_add_rows([]);
+          copy_shadow_rows_to_rows();
         }} 
       />
       <AddButton is_active={table_name != ""} on_add_row={add_row} />
       <Table 
         name={table_name}
         data={table_data}
+        data_shadow={table_data_shadow}
         add_to_delete_row={add_to_delete_row}
         remove_from_to_delete_row={remove_from_to_delete_row}
         rows_to_delete={rows_to_delete}
         add_rows={add_rows}
         remove_addable_row={remove_addable_row}
+        update_table_entry={update_table_entry}
       />
     </div>
   );

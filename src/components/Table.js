@@ -1,30 +1,37 @@
 import { useEffect, useState } from "react";
+import classNames from "classnames";
+
+import { objects_equal } from "../utils.js";
 
 import "./Table.css";
 
 export default function Table({ 
-  data = [], 
+  data = {}, 
+  data_shadow = {},
   name = "",
   add_to_delete_row,
   remove_from_to_delete_row,
   rows_to_delete = [],
   add_rows = [],
   remove_addable_row,
+  update_table_entry,
 }) {
   if (name == "") {
     return null;
   }
 
-  if (add_rows.length == 0 && data.length == 0) {
+  let add_rows_len = Object.keys(add_rows).length;
+  let data_len = Object.keys(data).length;
+
+  if (add_rows_len == 0 && data_len == 0) {
     return null;
   }
 
   let keys = [];
 
-  if (Object.keys(add_rows).length > 0) {
+  if (add_rows_len > 0) {
     keys = Object.keys(Object.values(add_rows)[0]);
   } else {
-    console.log(data);
     keys = Object.keys(Object.values(data)[0]);
   }
 
@@ -63,17 +70,24 @@ export default function Table({
         })}
         {Object.entries(data).map(([order, entry]) => {
           let is_pending_deletion = rows_to_delete.includes(order);
+          let is_edited = !objects_equal(entry, data_shadow[order]);
 
           return (
             <tr 
               key={order + name}
-              className={is_pending_deletion ? "pending-del" : ""}
+              className={classNames({
+                "pending-del": is_pending_deletion,
+                "changed": is_edited,
+              })}
             >
               {keys.map((key) => {
                 let value = entry[key];
 
                 return <td key={order + key + name}>
-                  <input className="table-input" value={value} />
+                  <input 
+                    onChange={event => update_table_entry(order, key, event.target.value)} 
+                    className="table-input" value={value} 
+                  />
                 </td>;
               })}
               <td>
