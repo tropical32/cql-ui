@@ -6,14 +6,14 @@
   color: cornflowerblue;
 }
 
-.table > tbody > tr.pending-del > td > input {
-  background: #F5671B;
-}
-
 .table > tbody > tr.addable > td > input {
   background: lightgreen;
 }
 
 .table > tbody > tr.changed > td > input {
   background: #EDE885;
+}
+
+.table > tbody > tr.pending-del > td > input {
+  background: #F5671B;
 }

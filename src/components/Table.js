@@ -73,8 +73,8 @@ export default function Table({
             <tr 
               key={order + name}
               className={classNames({
-                "pending-del": is_pending_deletion,
                 "changed": is_edited,
+                "pending-del": is_pending_deletion,
               })}
             >
               {columns.map((key) => {

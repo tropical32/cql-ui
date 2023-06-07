@@ -38,11 +38,11 @@ app.get('/api/data/:table', (req, res) => {
 
 app.get('/api/columns/:table', (req, res) => {
   const table = req.params.table;
-  const query = `SELECT column_name FROM system_schema.columns WHERE keyspace_name = '${keyspace}' AND table_name = '${table}';`;
+  const query = `SELECT column_name FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
+  const params = [keyspace, table];
 
-  client.execute(query)
+  client.execute(query, params)
     .then((result) => {
-      console.log(result);
       res.json(result.rows.map(({ column_name }) => column_name));
     })
     .catch((err) => {
@@ -52,9 +52,10 @@ app.get('/api/columns/:table', (req, res) => {
 });
 
 app.get('/api/tables', (req, res) => {
-  const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name = '${keyspace}';`;
+  const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name = ?;`;
+  const params = [keyspace];
 
-  client.execute(query)
+  client.execute(query, params)
     .then((result) => {
       res.json(result.rows.map(({ table_name }) => table_name));
     })
