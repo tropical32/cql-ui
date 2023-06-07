@@ -50,17 +50,29 @@ export default function Table({
         {Object.entries(add_rows).map(([order, entry]) => {
           return (
             <tr key={"addable-" + order} className="addable">
-              {columns.map(({ column_name, kind }) => {
+              {columns.map(({ column_name, kind, type }) => {
                 let value = entry[column_name];
 
-                return <td key={"addable-" + column_name + name}>
-                  <input 
-                    onChange={event => update_addable_table_entry(order, column_name, event.target.value)} 
-                    className="table-input" 
-                    value={value ?? ""} 
-                    placeholder="null"
-                  />
-                </td>;
+                if (type == "boolean") {
+                   return <td key={"addable-" + column_name + name}>
+                    <input 
+                      type="checkbox"
+                      onChange={event => update_addable_table_entry(order, column_name, event.target.checked)} 
+                      className="table-input" 
+                      value={value} 
+                      checked={value} 
+                    />
+                  </td>;
+                } else {
+                  return <td key={"addable-" + column_name + name}>
+                    <input 
+                      onChange={event => update_addable_table_entry(order, column_name, event.target.value)} 
+                      className="table-input" 
+                      value={value ?? ""} 
+                      placeholder="null"
+                    />
+                  </td>;
+               }
               })}
               <td>
                 <button 
@@ -86,20 +98,33 @@ export default function Table({
                 "pending-del": is_pending_deletion,
               })}
             >
-              {columns.map(({ column_name, kind }) => {
+              {columns.map(({ column_name, kind, type }) => {
                 let value = entry[column_name];
                 let is_partition_key = kind === "partition_key";
                 let is_clustering_key = kind === "clustering";
 
-                return <td key={order + column_name + name}>
-                  <input 
-                    onChange={event => update_table_entry(order, column_name, event.target.value)} 
-                    className="table-input" 
-                    value={value ?? ""}
-                    placeholder="null"
-                    disabled={is_clustering_key || is_partition_key}
-                  />
-                </td>;
+                if (type == "boolean") {
+                  return <td key={order + column_name + name}>
+                    <input 
+                      type="checkbox"
+                      onChange={event => update_table_entry(order, column_name, event.target.checked)} 
+                      className="table-input" 
+                      value={value}
+                      checked={value}
+                      disabled={is_clustering_key || is_partition_key}
+                    />
+                  </td>;
+                } else {
+                  return <td key={order + column_name + name}>
+                    <input 
+                      onChange={event => update_table_entry(order, column_name, event.target.value)} 
+                      className="table-input" 
+                      value={value ?? ""}
+                      placeholder="null"
+                      disabled={is_clustering_key || is_partition_key}
+                    />
+                  </td>;
+                }
               })}
               <td>
                 <button 

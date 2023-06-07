@@ -39,7 +39,7 @@ app.get('/api/data/:table', (req, res) => {
 
 app.get('/api/columns/:table', (req, res) => {
   const table = req.params.table;
-  const query = `SELECT column_name, kind FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
+  const query = `SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
   const params = [keyspace, table];
 
   client.execute(query, params, options)
