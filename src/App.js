@@ -1,23 +1,51 @@
+import { useEffect, useState } from "react";
+import axios from 'axios';
+
+import Table from "./components/Table.js"
+import TableSelector from "./components/TableSelector.js"
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  let [tables, set_tables] = useState([]);
+  let [table_data, set_table_data] = useState([]);
+  let [error, set_error] = useState(null);
+  let axios_instance = axios.create({
+    baseURL: "http://127.0.0.1:7777",
+  });
+
+  function fetch_table_data(table_name) {
+    axios_instance.get(`/api/data/${table_name}`)
+    .then(response => {
+      // Process the data returned from the server
+
+      set_table_data(response.data);
+      console.log(response.data);
+    })
+    .catch(error => {
+      set_error(error);
+    });
+  }
+
+  useEffect(() => {
+    axios_instance.get("/api/tables")
+    .then(response => {
+      console.log(response.data);
+      set_tables(response.data);
+    })
+    .catch(error => {
+      set_error(error);
+    });
+  }, []);
+
+  if (error != null) {
+    return <div>{error.message}</div>;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="main">
+      <TableSelector tables={tables} onChange={(event) => fetch_table_data(event.target.value)} />
+      <Table data={table_data} />
     </div>
   );
 }
