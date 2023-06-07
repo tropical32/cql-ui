@@ -1,0 +1,7 @@
+.table thead tr td {
+  font-weight: 500;
+}
+
+.table > thead > tr > td.primary-key {
+  color: cornflowerblue;
+}
