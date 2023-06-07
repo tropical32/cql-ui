@@ -42,11 +42,11 @@ app.get('/api/info/:table', (req, res) => {
 
   client.execute(query)
     .then((result) => {
-      let { columns, primary_key } = extract_columns_and_primary_keys(
+      let { columns } = extract_columns(
         result.rows[0].create_statement
       );
 
-      res.json({ columns, primary_key });
+      res.json({ columns });
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -72,7 +72,7 @@ app.listen(port, () => {
 });
 
 
-function extract_columns_and_primary_keys(create_statement) {
+function extract_columns(create_statement) {
   const column_pattern = /^\s+(\w+)\s+(\w+)(?:,|$)/;
   const primary_key_pattern = /PRIMARY KEY \((.*?)\)/;
 
@@ -87,7 +87,6 @@ function extract_columns_and_primary_keys(create_statement) {
   );
   const lines = table_content.split(/\n|\r\n|\r/);
   const columns = [];
-  let primary_key = [];
 
   let is_parsing_columns = true;
 
@@ -103,15 +102,8 @@ function extract_columns_and_primary_keys(create_statement) {
         const column_type = column_match[2];
         columns.push({ name: column_name, type: column_type });
       }
-    } else {
-      const primary_key_match = primary_key_pattern.exec(line);
-      if (primary_key_match) {
-        const primary_key_columns = primary_key_match[1].split(',').map(key => key.trim());
-        primary_key = primary_key_columns;
-      }
     }
   }
 
-  return { columns, primary_key };
+  return { columns };
 }
-

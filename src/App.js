@@ -7,8 +7,6 @@ import SaveButton from "./components/SaveButton.js";
 import DiscardButton from "./components/DiscardButton.js";
 import AddButton from "./components/AddButton.js";
 
-import { get_default_type_value } from "./utils.js";
-
 import logo from "./logo.svg";
 import "./App.css";
 
@@ -40,6 +38,15 @@ function App() {
     });
   }
 
+  function update_addable_table_entry(key, column, value) {
+    set_add_rows(curr_add_rows => {
+      let next_add_rows = { ...curr_add_rows };
+      next_add_rows[key][column] = value;
+
+      return next_add_rows;
+    });
+  }
+
   function increase_add_row_counter() {
     row_counter.current += 1;
 
@@ -54,7 +61,7 @@ function App() {
     set_add_rows(curr_add_rows => {
       const next_add_row_counter = increase_add_row_counter();
       const empty_columns = Object.fromEntries(
-        table_info.columns.map(column => [column.name, get_default_type_value(column.type)])
+        table_info.columns.map(column => [column.name, ""])
       );
 
       return {...curr_add_rows, [next_add_row_counter]: empty_columns}
@@ -147,6 +154,7 @@ function App() {
       />
       <AddButton is_active={table_name != ""} on_add_row={add_row} />
       <Table 
+        update_addable_table_entry={update_addable_table_entry}
         name={table_name}
         data={table_data}
         data_shadow={table_data_shadow}

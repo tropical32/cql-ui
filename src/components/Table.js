@@ -15,6 +15,7 @@ export default function Table({
   add_rows = [],
   remove_addable_row,
   update_table_entry,
+  update_addable_table_entry={update_addable_table_entry}
 }) {
   if (name == "") {
     return null;
@@ -46,20 +47,24 @@ export default function Table({
         </tr>
       </thead>
       <tbody>
-        {Object.entries(add_rows).map(([key, entry]) => {
+        {Object.entries(add_rows).map(([order, entry]) => {
           return (
-            <tr key={"addable-" + key} className="addable">
+            <tr key={"addable-" + order} className="addable">
               {keys.map((key) => {
                 let value = entry[key];
 
                 return <td key={"addable-" + key + name}>
-                  <input className="table-input" value={value} />
+                  <input 
+                    onChange={event => update_addable_table_entry(order, key, event.target.value)} 
+                    className="table-input" 
+                    value={value} 
+                  />
                 </td>;
               })}
               <td>
                 <button 
                   onClick={() => {
-                    remove_addable_row(key);
+                    remove_addable_row(order);
                   }}
                 >
                   🗑️
