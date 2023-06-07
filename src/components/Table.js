@@ -3,24 +3,28 @@ import { useEffect, useState } from "react";
 import "./Table.css";
 
 export default function Table({ 
-  data, 
-  columns, 
-  primary_key, 
-  name,
+  data = [], 
+  columns = [], 
+  primary_key = [], 
+  name = "",
   add_to_delete_row,
   remove_from_to_delete_row,
   rows_to_delete = [],
+  add_rows = [],
+  remove_addable_row,
 }) {
-  if (
-    data.length == 0 
-    || columns.length == 0 
-    || primary_key.length == 0 
-    || name == ''
-  ) {
-    return null;
+  if (add_rows.length == 0) {
+    if (
+      data.length == 0 
+      || columns.length == 0 
+      || primary_key.length == 0 
+      || name == ''
+    ) {
+      return null;
+    }
   }
 
-  let keys = Object.keys(data[0]);
+  let keys = columns.map(col => col.name);
 
   return (
     <table key={name} className="table">
@@ -33,6 +37,28 @@ export default function Table({
         </tr>
       </thead>
       <tbody>
+        {Object.entries(add_rows).map(([key, entry]) => {
+          return (
+            <tr key={"addable-" + key} className="addable">
+              {keys.map((key) => {
+                let value = entry[key];
+
+                return <td key={"addable-" + key + name}>
+                  <input className="table-input" value={value} />
+                </td>;
+              })}
+              <td>
+                <button 
+                  onClick={() => {
+                    remove_addable_row(key);
+                  }}
+                >
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          );
+        })}
         {data.map((entry) => {
           let is_pending_deletion = rows_to_delete.some(
             id_object => primary_key.every(

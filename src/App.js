@@ -36,13 +36,20 @@ function App() {
   let [table_data, set_table_data] = useState([]);
   let [table_info, set_table_info] = useState({});
   let [error, set_error] = useState(null);
-  let [add_rows, set_add_rows] = useState([]);
+  let [add_rows, set_add_rows] = useState({});
+  let [add_row_counter, set_add_row_counter] = useState(0);
   let [rows_to_delete, set_rows_to_delete] = useState([]);
   let [rows_to_update, set_rows_to_update] = useState([]);
 
   let axios_instance = axios.create({
     baseURL: "http://127.0.0.1:7777",
   });
+
+  function increase_add_row_counter() {
+    set_add_row_counter(add_row_counter + 1);
+
+    return add_row_counter + 1;
+  }
 
   function add_to_delete_row(row) {
     set_rows_to_delete([...rows_to_delete, row]);
@@ -53,9 +60,16 @@ function App() {
       table_info.columns.map(column => [column.name, get_default_type_value(column.type)])
     );
 
-    set_add_rows([...add_rows, empty_columns]);
+    let next_add_row_counter = increase_add_row_counter();
+    set_add_rows({...add_rows, [next_add_row_counter]: empty_columns});
+  }
 
-    console.log(add_rows);
+  function remove_addable_row(id) {
+    console.log(id);
+    let next_addable_rows = { ...add_rows };
+    delete next_addable_rows[id];
+
+    set_add_rows(next_addable_rows);
   }
 
   function remove_from_to_delete_row(retained_row) {
@@ -143,6 +157,8 @@ function App() {
         add_to_delete_row={add_to_delete_row}
         remove_from_to_delete_row={remove_from_to_delete_row}
         rows_to_delete={rows_to_delete}
+        add_rows={add_rows}
+        remove_addable_row={remove_addable_row}
       />
     </div>
   );
