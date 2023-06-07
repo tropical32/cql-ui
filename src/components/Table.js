@@ -4,8 +4,6 @@ import "./Table.css";
 
 export default function Table({ 
   data = [], 
-  columns = [], 
-  primary_key = [], 
   name = "",
   add_to_delete_row,
   remove_from_to_delete_row,
@@ -13,25 +11,29 @@ export default function Table({
   add_rows = [],
   remove_addable_row,
 }) {
-  if (add_rows.length == 0) {
-    if (
-      data.length == 0 
-      || columns.length == 0 
-      || primary_key.length == 0 
-      || name == ''
-    ) {
-      return null;
-    }
+  if (name == "") {
+    return null;
   }
 
-  let keys = columns.map(col => col.name);
+  if (add_rows.length == 0 && data.length == 0) {
+    return null;
+  }
+
+  let keys = [];
+
+  if (Object.keys(add_rows).length > 0) {
+    keys = Object.keys(Object.values(add_rows)[0]);
+  } else {
+    console.log(data);
+    keys = Object.keys(Object.values(data)[0]);
+  }
 
   return (
     <table key={name} className="table">
       <thead>
         <tr>
           {keys.map((key) => (
-            <td className={primary_key.includes(key) ? "primary-key" : "" } key={key}>{key}</td>
+            <td key={key}>{key}</td>
           ))}
         <td />
         </tr>
@@ -59,36 +61,28 @@ export default function Table({
             </tr>
           );
         })}
-        {data.map((entry) => {
-          let is_pending_deletion = rows_to_delete.some(
-            id_object => primary_key.every(
-              pk => entry[pk] == id_object[pk]
-            )
-          );
+        {Object.entries(data).map(([order, entry]) => {
+          let is_pending_deletion = rows_to_delete.includes(order);
 
           return (
             <tr 
-              key={primary_key.map(pk => entry[pk]).join(",") + name}
+              key={order + name}
               className={is_pending_deletion ? "pending-del" : ""}
             >
               {keys.map((key) => {
                 let value = entry[key];
 
-                return <td 
-                  key={primary_key.map(pk => entry[pk]).join(",") + key + name}
-                >
+                return <td key={order + key + name}>
                   <input className="table-input" value={value} />
                 </td>;
               })}
               <td>
                 <button 
                   onClick={() => {
-                    const deleteRow = Object.fromEntries(primary_key.map(pk => [pk, entry[pk]]));
-
                     if (is_pending_deletion) {
-                      remove_from_to_delete_row(deleteRow);
+                      remove_from_to_delete_row(order);
                     } else {
-                      add_to_delete_row(deleteRow);
+                      add_to_delete_row(order);
                     }
                   }}
                 >
