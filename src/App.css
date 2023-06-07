@@ -9,3 +9,7 @@
 .buttons-group {
   margin: 10px 0;
 }
+
+.buttons-group > button {
+  margin-right: 10px;
+}
