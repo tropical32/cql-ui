@@ -7,6 +7,7 @@ import Table from "./components/Table.js";
 import TableSelector from "./components/TableSelector.js";
 import SaveButton from "./components/SaveButton.js";
 import DiscardButton from "./components/DiscardButton.js";
+import Filters from "./components/Filters.js";
 import AddButton from "./components/AddButton.js";
 
 import "./App.css";
@@ -119,9 +120,9 @@ function App() {
     });
   }
 
-  function fetch_table_data(table_name) {
+  function fetch_table_data(table_name, query_params) {
     axios_instance
-      .get(`/api/data/${table_name}`)
+      .get(`/api/data/${table_name}`, { params: query_params })
       .then((response) => {
         let ordered_table_data = Object.fromEntries(
           response.data.map(row => [decrement_add_row_counter(), row])
@@ -146,6 +147,24 @@ function App() {
       .catch((error) => {
         set_error(error);
       });
+  }
+
+  function on_filter_submit(event) {
+    event.preventDefault();
+
+    const form_elements = event.target.elements;
+
+    const filter_values = {};
+    for (let i = 0; i < form_elements.length; i++) {
+      const element = form_elements[i];
+      if (element.tagName === "INPUT") {
+        if (element.value !== "") {
+          filter_values[element.name] = element.value;
+        }
+      }
+    }
+
+    fetch_table_data(table_name, { filters: filter_values });
   }
 
   useEffect(() => {
@@ -192,6 +211,9 @@ function App() {
           }} 
         />
         <AddButton is_active={table_name !== ""} on_add_row={add_row} />
+      </div>
+      <div className="buttons-group">
+        <Filters table_columns={table_columns} on_submit={on_filter_submit} />
       </div>
       <Table 
         columns={table_columns}

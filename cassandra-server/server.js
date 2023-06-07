@@ -28,15 +28,35 @@ client.connect()
 
 app.get('/api/data/:table', (req, res) => {
   const table = req.params.table;
-  const query = `SELECT * FROM ${table}`;
+  let query = `SELECT * FROM ${table}`;
 
-  client.execute(query, [], options)
+  const filters = req.query.filters || req.body.filters;
+  const filterParams = [];
+
+  if (filters) {
+    const filterConditions = [];
+
+    Object.entries(filters).map(([col, val]) => {
+      filterConditions.push(`${col} = ?`);
+      filterParams.push(val);
+    });
+
+    console.log(filterConditions);
+
+    if (filterConditions.length > 0) {
+      query += ` WHERE ${filterConditions.join(' AND ')}`;
+    }
+  }
+
+  console.log(query, filterParams);
+
+  client.execute(query, filterParams, { ...options, prepare: true })
     .then((result) => {
       res.json(result.rows);
     })
     .catch((err) => {
       console.error('Error executing query', err);
-      res.status(500).json({ error: 'Error executing query' });
+      res.status(500).json({ error: err.message });
     });
 });
 
