@@ -13,7 +13,7 @@ const client = new Client({
   localDataCenter: 'datacenter1',
   keyspace: keyspace,
 });
-const options = { fetchSize: 1000 };
+const options = { fetchSize: 200 };
 
 client.connect()
   .then(() => {

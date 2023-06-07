@@ -15,7 +15,7 @@ export default function Table({
   remove_addable_row,
   update_table_entry,
   update_addable_table_entry,
-  columns,
+  columns = [],
 }) {
   if (name === "") {
     return null;
@@ -64,12 +64,16 @@ export default function Table({
                     />
                   </td>;
                 } else {
+                  let is_text_input = type === "text";
+                  let is_timestamp_input = type === "timestamp";
+
                   return <td key={"addable-" + column_name + name}>
                     <input 
                       onChange={event => update_addable_table_entry(order, column_name, event.target.value)} 
                       className="table-input" 
                       value={value ?? ""} 
                       placeholder="null"
+                      type={is_text_input || is_timestamp_input ? "text" : "number"}
                     />
                   </td>;
                }
@@ -115,6 +119,9 @@ export default function Table({
                     />
                   </td>;
                 } else {
+                  let is_text_input = type === "text";
+                  let is_timestamp_input = type === "timestamp";
+
                   return <td key={order + column_name + name}>
                     <input 
                       onChange={event => update_table_entry(order, column_name, event.target.value)} 
@@ -122,6 +129,7 @@ export default function Table({
                       value={value ?? ""}
                       placeholder="null"
                       disabled={is_clustering_key || is_partition_key}
+                      type={is_text_input || is_timestamp_input ? "text" : "number"}
                     />
                   </td>;
                 }
