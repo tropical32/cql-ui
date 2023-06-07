@@ -58,7 +58,6 @@ function App() {
   function add_row() {
     set_add_rows(curr_add_rows => {
       const next_add_row_counter = increase_add_row_counter();
-      console.log(next_add_row_counter);
       const empty_columns = Object.fromEntries(
         table_info.columns.map(column => [column.name, get_default_type_value(column.type)])
       );
@@ -68,7 +67,6 @@ function App() {
   }
 
   function remove_addable_row(id) {
-    console.log(id);
     let next_addable_rows = { ...add_rows };
     delete next_addable_rows[id];
 
@@ -88,8 +86,6 @@ function App() {
         let ordered_table_data = Object.fromEntries(
           response.data.map(row => [increase_add_row_counter(), row])
         );
-
-        console.log(ordered_table_data);
 
         set_table_data(ordered_table_data);
         set_error(null);
