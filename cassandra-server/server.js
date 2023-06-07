@@ -20,10 +20,10 @@ const options = { fetchSize: 200 };
 
 client.connect()
   .then(() => {
-    console.log('Connected to Cassandra');
+    console.log('Connected to DB');
   })
   .catch((err) => {
-    console.error('Error connecting to Cassandra', err);
+    console.error('Error connecting to DB', err);
   });
 
 app.get('/api/data/:table', (req, res) => {
@@ -79,38 +79,50 @@ app.post('/api/data/:table', (req, res) => {
   client.execute(query, params, options)
     .then((result) => {
       const table_info = result.rows;
-      const key_cols = table_info.filter(({ kind }) => kind === "partition_key" || kind === "clustering").map(({ column_name }) => column_name);
+      const key_cols = table_info
+        .filter(({ kind }) => kind === "partition_key" || kind === "clustering")
+        .map(({ column_name }) => column_name);
 
       const update_queries = edited_rows.map(row => {
         const update_set_part = [];
         const update_where_part = [];
+        const query_params = [];
 
-        Object.entries(row).forEach(([col, val]) => {
-          if (key_cols.includes(col)) {
-            update_where_part.push(`${col} = ${val}`);
-          } else {
-            update_set_part.push(`${col} = ${val}`);
-          }
+        const row_entries = Object.entries(row);
+        const key_pairs = row_entries.filter(([col, val]) => key_cols.includes(col));
+        const regular_pairs = row_entries.filter(([col, val]) => !key_cols.includes(col));
+
+        regular_pairs.forEach(([col, val]) => {
+          update_set_part.push(`${col} = ?`);
+          query_params.push(val);
         });
 
-        return `UPDATE ${keyspace}.${table} SET ${update_set_part.join(", ")} WHERE ${update_where_part.join(" AND ")};`;
+        key_pairs.forEach(([col, val]) => {
+          update_where_part.push(`${col} = ?`);
+          query_params.push(val);
+        });
+
+        const update_query = `UPDATE ${keyspace}.${table} SET ${update_set_part.join(",")} WHERE ${update_where_part.join(" AND ")};`;
+        return { query: update_query, params: query_params };
       });
 
       const insert_queries = added_rows.map(row => {
-        let col_names = Object.keys(row);
-        let col_vals = Object.values(row);
-
-        return `INSERT INTO ${keyspace}.${table} (${col_names.join(",")}) VALUES (${col_vals.join(",")});`
+        const col_names = Object.keys(row);
+        const col_vals = Object.values(row);
+        const value_placeholders = col_vals.map(() => '?');
+        const insert_query = `INSERT INTO ${keyspace}.${table} (${col_names.join(", ")}) VALUES (${value_placeholders.join(", ")});`;
+        const insert_params = col_vals;
+        return { query: insert_query, params: insert_params };
       });
 
       const delete_queries = deleted_rows.map(row => {
-        let where_part = key_cols
-          .map(col_name => ([col_name, row[col_name]]))
-          .map(([col_name, col_val]) => `${col_name} = ${col_val}`);
-        return `DELETE FROM ${keyspace}.${table} WHERE ${where_part.join(" AND ")};`;
+        const where_part = key_cols.map(col_name => `${col_name} = ?`);
+        const delete_query = `DELETE FROM ${keyspace}.${table} WHERE ${where_part.join(" AND ")};`;
+        const delete_params = key_cols.map(col_name => row[col_name]);
+        return { query: delete_query, params: delete_params };
       });
 
-      return client.batch([...update_queries, ...insert_queries, ...delete_queries]);
+      return client.batch([...update_queries, ...insert_queries, ...delete_queries], { prepare: true });
     })
     .then(() => {
       console.log('Data updated on cluster');
