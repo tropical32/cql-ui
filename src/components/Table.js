@@ -23,8 +23,13 @@ export default function Table({
 
   let add_rows_len = Object.keys(add_rows).length;
   let data_len = Object.keys(data).length;
+  let shadow_data_len = Object.keys(data_shadow).length;
 
   if (add_rows_len === 0 && data_len === 0) {
+    return null;
+  }
+
+  if (data_len != shadow_data_len) {
     return null;
   }
 

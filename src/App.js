@@ -48,8 +48,8 @@ function App() {
     });
   }
 
-  function increase_add_row_counter() {
-    row_counter.current += 1;
+  function decrement_add_row_counter() {
+    row_counter.current -= 1;
 
     return row_counter.current;
   }
@@ -60,7 +60,7 @@ function App() {
 
   function add_row() {
     set_add_rows(curr_add_rows => {
-      const next_add_row_counter = increase_add_row_counter();
+      const next_add_row_counter = decrement_add_row_counter();
       const empty_columns = Object.fromEntries(
         table_columns.map(({ column_name }) => [column_name, ""])
       );
@@ -91,9 +91,23 @@ function App() {
     if (edited_rows.length > 0 || add_rows_array.length > 0 || rows_to_delete.length > 0) {
       axios_instance
         .post(`/api/data/${table_name}`, data)
-        .then(res => console.log(res))
-        .catch(err => !console.log(err) && set_error(err));
+        .then(update_table_data_on_success)
+        .catch(err => set_error(err));
     }
+  }
+
+  function update_table_data_on_success() {
+    const new_table_data = { ...add_rows, ...structuredClone(table_data) };
+    for (const delete_id of rows_to_delete) {
+      delete new_table_data[delete_id];
+    }
+    const new_table_data_shadow = structuredClone(new_table_data);
+
+    set_error(null);
+    set_table_data(new_table_data);
+    set_table_data_shadow(new_table_data_shadow);
+    set_add_rows({});
+    set_rows_to_delete([]);
   }
 
   function remove_addable_row(id) {
@@ -114,7 +128,7 @@ function App() {
       .get(`/api/data/${table_name}`)
       .then((response) => {
         let ordered_table_data = Object.fromEntries(
-          response.data.map(row => [increase_add_row_counter(), row])
+          response.data.map(row => [decrement_add_row_counter(), row])
         );
 
         set_table_data(ordered_table_data);
