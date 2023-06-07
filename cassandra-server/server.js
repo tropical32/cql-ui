@@ -96,11 +96,18 @@ app.post('/api/data/:table', (req, res) => {
         return `UPDATE ${keyspace}.${table} SET ${update_set_part.join(", ")} WHERE ${update_where_part.join(" AND ")};`;
       });
 
-      return client.batch(update_queries);
+      const insert_queries = added_rows.map(row => {
+        let col_names = Object.keys(row);
+        let col_vals = Object.values(row);
+
+        return `INSERT INTO ${keyspace}.${table} (${col_names.join(",")}) VALUES (${col_vals.join(",")});`
+      });
+
+      return client.batch([...update_queries, ...insert_queries]);
     })
     .then(() => {
       console.log('Data updated on cluster');
-      res.status(200).json({ message: 'Data updated successfully' });
+      res.status(200).json({ message: 'Data updated successfully.' });
     })
     .catch((err) => {
       console.error(err);

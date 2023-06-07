@@ -32,7 +32,7 @@ function App() {
 
   function update_table_entry(key, column, value) {
     set_table_data(curr_table_data => {
-      let next_table_data = { ...curr_table_data };
+      let next_table_data = structuredClone(curr_table_data);
       next_table_data[key][column] = value;
 
       return next_table_data;
@@ -41,7 +41,7 @@ function App() {
 
   function update_addable_table_entry(key, column, value) {
     set_add_rows(curr_add_rows => {
-      let next_add_rows = { ...curr_add_rows };
+      let next_add_rows = structuredClone(curr_add_rows);
       next_add_rows[key][column] = value;
 
       return next_add_rows;
@@ -62,7 +62,7 @@ function App() {
     set_add_rows(curr_add_rows => {
       const next_add_row_counter = increase_add_row_counter();
       const empty_columns = Object.fromEntries(
-        table_columns.map(column => [column.name, ""])
+        table_columns.map(({ column_name }) => [column_name, ""])
       );
 
       return {...curr_add_rows, [next_add_row_counter]: empty_columns}
@@ -79,25 +79,27 @@ function App() {
       .map(([id, _]) => id);
 
     const edited_rows = edited_rows_ids.map(id => table_data[id]);
+    const add_rows_array = Object.values(add_rows);
+    console.log(add_rows);
 
     const data = {
       edited_rows: edited_rows,
-      added_rows: add_rows,
+      added_rows: add_rows_array,
       deleted_rows: rows_to_delete
     };
 
-    if (edited_rows.length > 0) {
+    if (edited_rows.length > 0 || add_rows_array.length > 0 || rows_to_delete.length > 0) {
       axios_instance
         .post(`/api/data/${table_name}`, data)
         .then(res => console.log(res))
         .catch(err => !console.log(err) && set_error(err));
     }
 
-    console.log(edited_rows);
+    console.log(add_rows);
   }
 
   function remove_addable_row(id) {
-    let next_addable_rows = { ...add_rows };
+    let next_addable_rows = structuredClone(add_rows);
     delete next_addable_rows[id];
 
     set_add_rows(next_addable_rows);
