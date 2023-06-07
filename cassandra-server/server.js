@@ -94,7 +94,7 @@ app.post('/api/data/:table', (req, res) => {
 
         regular_pairs.forEach(([col, val]) => {
           update_set_part.push(`${col} = ?`);
-          query_params.push(val);
+          query_params.push(val || null);
         });
 
         key_pairs.forEach(([col, val]) => {
@@ -111,7 +111,7 @@ app.post('/api/data/:table', (req, res) => {
         const col_vals = Object.values(row);
         const value_placeholders = col_vals.map(() => '?');
         const insert_query = `INSERT INTO ${keyspace}.${table} (${col_names.join(", ")}) VALUES (${value_placeholders.join(", ")});`;
-        const insert_params = col_vals;
+        const insert_params = col_vals.map(val => val || null);
         return { query: insert_query, params: insert_params };
       });
 
