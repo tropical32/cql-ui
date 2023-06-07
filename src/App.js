@@ -182,15 +182,17 @@ function App() {
           }
         }}
       />
-      <SaveButton on_save={on_save} />
-      <DiscardButton 
-        onDiscardChanges={() => {
-          set_rows_to_delete([]);
-          set_add_rows([]);
-          copy_shadow_rows_to_rows();
-        }} 
-      />
-      <AddButton is_active={table_name !== ""} on_add_row={add_row} />
+      <div className="buttons-group">
+        <SaveButton on_save={on_save} />
+        <DiscardButton 
+          onDiscardChanges={() => {
+            set_rows_to_delete([]);
+            set_add_rows([]);
+            copy_shadow_rows_to_rows();
+          }} 
+        />
+        <AddButton is_active={table_name !== ""} on_add_row={add_row} />
+      </div>
       <Table 
         columns={table_columns}
         update_addable_table_entry={update_addable_table_entry}

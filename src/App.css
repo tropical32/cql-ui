@@ -5,3 +5,7 @@
 .error {
   color: red;
 }
+
+.buttons-group {
+  margin: 10px 0;
+}
