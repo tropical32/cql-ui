@@ -124,8 +124,12 @@ function App() {
     axios_instance
       .get(`/api/data/${table_name}`, { params: query_params })
       .then((response) => {
+        let rows_stringified = response.data.map(row => Object.fromEntries(
+          Object.entries(row).map(([col, val]) => ([col, val == null ? null : val.toString()]))
+        ));
+
         let ordered_table_data = Object.fromEntries(
-          response.data.map(row => [decrement_add_row_counter(), row])
+          rows_stringified.map(row => [decrement_add_row_counter(), row])
         );
 
         set_table_data(ordered_table_data);
