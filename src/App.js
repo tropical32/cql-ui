@@ -41,6 +41,7 @@ function App() {
       .get(`/api/data/${table_name}`)
       .then((response) => {
         set_table_data(response.data);
+        set_error(null);
       })
       .catch((error) => {
         set_error(error);
@@ -52,6 +53,7 @@ function App() {
       .get(`/api/info/${table_name}`)
       .then((response) => {
         set_table_info(response.data);
+        set_error(null);
       })
       .catch((error) => {
         set_error(error);
@@ -63,18 +65,16 @@ function App() {
       .get("/api/tables")
       .then((response) => {
         set_tables(response.data);
+        set_error(null);
       })
       .catch((error) => {
         set_error(error);
       });
   }, []);
 
-  if (error != null) {
-    return <div>{error.message}</div>;
-  }
-
   return (
     <div className="main">
+      {error && <div className="error">{error.message}</div>}
       <TableSelector
         tables={tables}
         onChange={(event) => {
