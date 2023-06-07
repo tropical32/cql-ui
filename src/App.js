@@ -95,6 +95,18 @@ function App() {
       });
   }
 
+  function fetch_table_info(table_name) {
+    axios_instance
+      .get(`/api/info/${table_name}`)
+      .then((response) => {
+        set_table_info(response.data);
+        set_error(null);
+      })
+      .catch((error) => {
+        set_error(error);
+      });
+  }
+
   useEffect(() => {
     axios_instance
       .get("/api/tables")
@@ -124,6 +136,7 @@ function App() {
 
           if (table_name != "") {
             set_table_name(table_name);
+            fetch_table_info(table_name);
             fetch_table_data(table_name);
           }
         }}
