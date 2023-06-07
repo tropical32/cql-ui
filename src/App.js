@@ -97,17 +97,13 @@ function App() {
   }
 
   function update_table_data_on_success() {
-    const new_table_data = { ...add_rows, ...structuredClone(table_data) };
-    for (const delete_id of rows_to_delete) {
-      delete new_table_data[delete_id];
-    }
-    const new_table_data_shadow = structuredClone(new_table_data);
-
     set_error(null);
-    set_table_data(new_table_data);
-    set_table_data_shadow(new_table_data_shadow);
-    set_add_rows({});
+    set_table_data({});
+    set_table_data_shadow({});
     set_rows_to_delete([]);
+    set_add_rows({});
+
+    fetch_table_data(table_name);
   }
 
   function remove_addable_row(id) {
