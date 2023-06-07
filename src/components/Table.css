@@ -5,3 +5,7 @@
 .table > thead > tr > td.primary-key {
   color: cornflowerblue;
 }
+
+.table > tbody > tr.pending-del > td > input {
+  background: red;
+}

@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 
 import "./Table.css";
 
-export default function Table({ data, columns, primary_key, name }) {
-  console.log(data, columns, primary_key, name);
-
-  let [to_delete, set_to_delete] = useState([]);
-  let [to_update, set_to_update] = useState([]);
-
-  function add_to_delete_row(row) {
-    to_delete = [...to_delete, row];
-  }
-
+export default function Table({ 
+  data, 
+  columns, 
+  primary_key, 
+  name,
+  add_to_delete_row,
+  remove_from_to_delete_row,
+  rows_to_delete = [],
+}) {
   if (data.length == 0 || columns.length == 0 || primary_key.length == 0) {
     return null;
   }
@@ -30,18 +29,41 @@ export default function Table({ data, columns, primary_key, name }) {
       </thead>
       <tbody>
         {data.map((entry) => {
+          let is_pending_deletion = rows_to_delete.some(
+            id_object => primary_key.every(
+              pk => entry[pk] == id_object[pk]
+            )
+          );
+
           return (
-            <tr key={primary_key.map(pk => entry[pk]).join(",")}>
+            <tr 
+              key={primary_key.map(pk => entry[pk]).join(",")}
+              className={is_pending_deletion ? "pending-del" : ""}
+            >
               {keys.map((key) => {
                 let value = entry[key];
 
-                return <td key={primary_key.map(pk => entry[pk]).join(",") + key}>
+                return <td 
+                  key={primary_key.map(pk => entry[pk]).join(",") + key}
+                >
                   <input className="table-input" value={value} />
                 </td>;
               })}
-            <td>
-              <button onClick={add_to_delete_row}>🗑️</button>
-            </td>
+              <td>
+                <button 
+                  onClick={() => {
+                    const deleteRow = Object.fromEntries(primary_key.map(pk => [pk, entry[pk]]));
+
+                    if (is_pending_deletion) {
+                      remove_from_to_delete_row(deleteRow);
+                    } else {
+                      add_to_delete_row(deleteRow);
+                    }
+                  }}
+                >
+                  🗑️
+                </button>
+              </td>
             </tr>
           );
         })}
