@@ -152,7 +152,7 @@ function App() {
 
   return (
     <div className="main">
-      {error && <div className="error">{error.response.data.error}</div>}
+      {error && <div className="error">{error?.response?.data?.error}</div>}
       <TableSelector
         tables={tables}
         onChange={(event) => {
