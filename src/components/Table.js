@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import classNames from "classnames";
 
 import { objects_equal } from "../utils.js";
@@ -15,16 +14,16 @@ export default function Table({
   add_rows = [],
   remove_addable_row,
   update_table_entry,
-  update_addable_table_entry={update_addable_table_entry}
+  update_addable_table_entry,
 }) {
-  if (name == "") {
+  if (name === "") {
     return null;
   }
 
   let add_rows_len = Object.keys(add_rows).length;
   let data_len = Object.keys(data).length;
 
-  if (add_rows_len == 0 && data_len == 0) {
+  if (add_rows_len === 0 && data_len === 0) {
     return null;
   }
 

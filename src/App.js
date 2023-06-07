@@ -7,7 +7,6 @@ import SaveButton from "./components/SaveButton.js";
 import DiscardButton from "./components/DiscardButton.js";
 import AddButton from "./components/AddButton.js";
 
-import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
@@ -77,7 +76,7 @@ function App() {
 
   function remove_from_to_delete_row(retained_row_id) {
     set_rows_to_delete(curr_rows_to_delete => {
-      return curr_rows_to_delete.filter(id => id != retained_row_id);
+      return curr_rows_to_delete.filter(id => id !== retained_row_id);
     });
   }
 
@@ -120,7 +119,7 @@ function App() {
       .catch((error) => {
         set_error(error);
       });
-  }, []);
+  }, [axios_instance]);
 
   return (
     <div className="main">
@@ -137,7 +136,7 @@ function App() {
 
           let table_name = event.target.value;
 
-          if (table_name != "") {
+          if (table_name !== "") {
             set_table_name(table_name);
             fetch_table_info(table_name);
             fetch_table_data(table_name);
@@ -152,7 +151,7 @@ function App() {
           copy_shadow_rows_to_rows();
         }} 
       />
-      <AddButton is_active={table_name != ""} on_add_row={add_row} />
+      <AddButton is_active={table_name !== ""} on_add_row={add_row} />
       <Table 
         update_addable_table_entry={update_addable_table_entry}
         name={table_name}
