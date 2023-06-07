@@ -70,13 +70,28 @@ function App() {
   }
 
   function on_save() {
-    const edited_rows = Object
+    const edited_rows_ids = Object
       .entries(table_data)
       .filter(([id, data_row]) => {
         const shadow_row = table_data_shadow[id];
         return !objects_equal(data_row, shadow_row);
       })
       .map(([id, _]) => id);
+
+    const edited_rows = edited_rows_ids.map(id => table_data[id]);
+
+    const data = {
+      edited_rows: edited_rows,
+      added_rows: add_rows,
+      deleted_rows: rows_to_delete
+    };
+
+    if (edited_rows.length > 0) {
+      axios_instance
+        .post(`/api/data/${table_name}`, data)
+        .then(res => console.log(res))
+        .catch(err => !console.log(err) && set_error(err));
+    }
 
     console.log(edited_rows);
   }
@@ -137,7 +152,7 @@ function App() {
 
   return (
     <div className="main">
-      {error && <div className="error">{error.message}</div>}
+      {error && <div className="error">{error.response.data.error}</div>}
       <TableSelector
         tables={tables}
         onChange={(event) => {
