@@ -80,12 +80,12 @@ function App() {
 
     const edited_rows = edited_rows_ids.map(id => table_data[id]);
     const add_rows_array = Object.values(add_rows);
-    console.log(add_rows);
+    const rows_to_delete_array = rows_to_delete.map(id => table_data[id]);
 
     const data = {
       edited_rows: edited_rows,
       added_rows: add_rows_array,
-      deleted_rows: rows_to_delete
+      deleted_rows: rows_to_delete_array
     };
 
     if (edited_rows.length > 0 || add_rows_array.length > 0 || rows_to_delete.length > 0) {
@@ -94,8 +94,6 @@ function App() {
         .then(res => console.log(res))
         .catch(err => !console.log(err) && set_error(err));
     }
-
-    console.log(add_rows);
   }
 
   function remove_addable_row(id) {

@@ -103,7 +103,14 @@ app.post('/api/data/:table', (req, res) => {
         return `INSERT INTO ${keyspace}.${table} (${col_names.join(",")}) VALUES (${col_vals.join(",")});`
       });
 
-      return client.batch([...update_queries, ...insert_queries]);
+      const delete_queries = deleted_rows.map(row => {
+        let where_part = key_cols
+          .map(col_name => ([col_name, row[col_name]]))
+          .map(([col_name, col_val]) => `${col_name} = ${col_val}`);
+        return `DELETE FROM ${keyspace}.${table} WHERE ${where_part.join(" AND ")};`;
+      });
+
+      return client.batch([...update_queries, ...insert_queries, ...delete_queries]);
     })
     .then(() => {
       console.log('Data updated on cluster');
