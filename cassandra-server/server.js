@@ -42,7 +42,9 @@ app.get('/api/info/:table', (req, res) => {
 
   client.execute(query)
     .then((result) => {
-      let { columns, primary_key } = extractColumnsAndPrimaryKeys(result.rows[0].create_statement);
+      let { columns, primary_key } = extract_columns_and_primary_keys(
+        result.rows[0].create_statement
+      );
 
       res.json({ columns, primary_key });
     })
@@ -70,40 +72,42 @@ app.listen(port, () => {
 });
 
 
-function extractColumnsAndPrimaryKeys(createStatement) {
-  const columnPattern = /^\s+(\w+)\s+(\w+)(?:,|$)/;
-  const primaryKeyPattern = /PRIMARY KEY \((.*?)\)/;
+function extract_columns_and_primary_keys(create_statement) {
+  const column_pattern = /^\s+(\w+)\s+(\w+)(?:,|$)/;
+  const primary_key_pattern = /PRIMARY KEY \((.*?)\)/;
 
-  const tableMatch = /CREATE TABLE \w+\.(.*?) \(/.exec(createStatement);
-  if (!tableMatch) {
+  const table_match = /CREATE TABLE \w+\.(.*?) \(/.exec(create_statement);
+  if (!table_match) {
     throw new Error('Invalid create statement');
   }
 
-  const tableName = tableMatch[1];
-  const tableContent = createStatement.substring(createStatement.indexOf('(') + 1, createStatement.lastIndexOf(')'));
-  const lines = tableContent.split(/\n|\r\n|\r/);
+  const tableName = table_match[1];
+  const table_content = create_statement.substring(
+    create_statement.indexOf('(') + 1, create_statement.lastIndexOf(')')
+  );
+  const lines = table_content.split(/\n|\r\n|\r/);
   const columns = [];
   let primary_key = [];
 
-  let isParsingColumns = true;
+  let is_parsing_columns = true;
 
   for (const line of lines) {
     if (line.includes('PRIMARY KEY')) {
-      isParsingColumns = false;
+      is_parsing_columns = false;
     }
 
-    if (isParsingColumns) {
-      const columnMatch = columnPattern.exec(line);
-      if (columnMatch) {
-        const columnName = columnMatch[1];
-        const columnType = columnMatch[2];
-        columns.push({ name: columnName, type: columnType });
+    if (is_parsing_columns) {
+      const column_match = column_pattern.exec(line);
+      if (column_match) {
+        const column_name = column_match[1];
+        const column_type = column_match[2];
+        columns.push({ name: column_name, type: column_type });
       }
     } else {
-      const primaryKeyMatch = primaryKeyPattern.exec(line);
-      if (primaryKeyMatch) {
-        const primaryKeyColumns = primaryKeyMatch[1].split(',').map(key => key.trim());
-        primary_key = primaryKeyColumns;
+      const primary_key_match = primary_key_pattern.exec(line);
+      if (primary_key_match) {
+        const primary_key_columns = primary_key_match[1].split(',').map(key => key.trim());
+        primary_key = primary_key_columns;
       }
     }
   }

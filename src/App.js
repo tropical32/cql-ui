@@ -5,6 +5,7 @@ import Table from "./components/Table.js";
 import TableSelector from "./components/TableSelector.js";
 import SaveButton from "./components/SaveButton.js";
 import DiscardButton from "./components/DiscardButton.js";
+import AddButton from "./components/AddButton.js";
 
 import logo from "./logo.svg";
 import "./App.css";
@@ -15,6 +16,7 @@ function App() {
   let [table_data, set_table_data] = useState([]);
   let [table_info, set_table_info] = useState({});
   let [error, set_error] = useState(null);
+  let [add_rows, set_add_rows] = useState([]);
   let [rows_to_delete, set_rows_to_delete] = useState([]);
   let [rows_to_update, set_rows_to_update] = useState([]);
 
@@ -24,6 +26,10 @@ function App() {
 
   function add_to_delete_row(row) {
     set_rows_to_delete([...rows_to_delete, row]);
+  }
+
+  function add_row(row) {
+    set_add_rows([...add_rows, row]);
   }
 
   function remove_from_to_delete_row(retained_row) {
@@ -84,9 +90,13 @@ function App() {
           set_table_name("");
           set_table_info({});
 
-          set_table_name(event.target.value);
-          fetch_table_info(event.target.value);
-          fetch_table_data(event.target.value);
+          let table_name = event.target.value;
+
+          if (table_name != "") {
+            set_table_name(table_name);
+            fetch_table_info(table_name);
+            fetch_table_data(table_name);
+          }
         }}
       />
       <SaveButton />
@@ -96,6 +106,7 @@ function App() {
           set_rows_to_update([]);
         }} 
       />
+      <AddButton is_active={table_name != ""} on_add_row={add_row} />
       <Table 
         name={table_name}
         columns={table_info.columns}
