@@ -10,7 +10,8 @@ export function objects_equal(obj_a, obj_b) {
     let obj_a_val = obj_a[key] ?? "";
     let obj_b_val = obj_b[key] ?? "";
 
-    if (obj_a_val !== obj_b_val) {
+    if (obj_a_val.toString() !== obj_b_val.toString()) {
+      console.log("not equal!", key, obj_a_val, obj_b_val);
       return false;
     }
   }
