@@ -88,6 +88,8 @@ export default function Table({
             >
               {columns.map(({ column_name, kind }) => {
                 let value = entry[column_name];
+                let is_partition_key = kind === "partition_key";
+                let is_clustering_key = kind === "clustering";
 
                 return <td key={order + column_name + name}>
                   <input 
@@ -95,6 +97,7 @@ export default function Table({
                     className="table-input" 
                     value={value ?? ""}
                     placeholder="null"
+                    disabled={is_clustering_key || is_partition_key}
                   />
                 </td>;
               })}

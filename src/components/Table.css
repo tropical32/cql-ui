@@ -11,13 +11,17 @@
 }
 
 .table > tbody > tr.addable > td > input {
-  background: lightgreen;
+  background: #90EE90;
 }
 
 .table > tbody > tr.changed > td > input {
-  background: #EDE885;
+  background: #F7DF8D;
 }
 
 .table > tbody > tr.pending-del > td > input {
-  background: #F5671B;
+  background: #F5A69C;
+}
+
+.table input:disabled {
+  background: #F4EDFA;
 }
