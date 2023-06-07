@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 
-import Table from "./components/Table.js"
-import TableSelector from "./components/TableSelector.js"
-import logo from './logo.svg';
-import './App.css';
+import Table from "./components/Table.js";
+import TableSelector from "./components/TableSelector.js";
+import logo from "./logo.svg";
+import "./App.css";
 
 function App() {
   let [tables, set_tables] = useState([]);
@@ -15,27 +15,25 @@ function App() {
   });
 
   function fetch_table_data(table_name) {
-    axios_instance.get(`/api/data/${table_name}`)
-    .then(response => {
-      // Process the data returned from the server
-
-      set_table_data(response.data);
-      console.log(response.data);
-    })
-    .catch(error => {
-      set_error(error);
-    });
+    axios_instance
+      .get(`/api/data/${table_name}`)
+      .then((response) => {
+        set_table_data(response.data);
+      })
+      .catch((error) => {
+        set_error(error);
+      });
   }
 
   useEffect(() => {
-    axios_instance.get("/api/tables")
-    .then(response => {
-      console.log(response.data);
-      set_tables(response.data);
-    })
-    .catch(error => {
-      set_error(error);
-    });
+    axios_instance
+      .get("/api/tables")
+      .then((response) => {
+        set_tables(response.data);
+      })
+      .catch((error) => {
+        set_error(error);
+      });
   }, []);
 
   if (error != null) {
@@ -44,7 +42,10 @@ function App() {
 
   return (
     <div className="main">
-      <TableSelector tables={tables} onChange={(event) => fetch_table_data(event.target.value)} />
+      <TableSelector
+        tables={tables}
+        onChange={(event) => fetch_table_data(event.target.value)}
+      />
       <Table data={table_data} />
     </div>
   );
