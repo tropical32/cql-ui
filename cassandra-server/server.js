@@ -13,6 +13,7 @@ const client = new Client({
   localDataCenter: 'datacenter1',
   keyspace: keyspace,
 });
+const options = { fetchSize: 1000 };
 
 client.connect()
   .then(() => {
@@ -26,7 +27,7 @@ app.get('/api/data/:table', (req, res) => {
   const table = req.params.table;
   const query = `SELECT * FROM ${table}`;
 
-  client.execute(query)
+  client.execute(query, [], options)
     .then((result) => {
       res.json(result.rows);
     })
@@ -38,12 +39,12 @@ app.get('/api/data/:table', (req, res) => {
 
 app.get('/api/columns/:table', (req, res) => {
   const table = req.params.table;
-  const query = `SELECT column_name FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
+  const query = `SELECT column_name, kind FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
   const params = [keyspace, table];
 
-  client.execute(query, params)
+  client.execute(query, params, options)
     .then((result) => {
-      res.json(result.rows.map(({ column_name }) => column_name));
+      res.json(result.rows);
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -55,7 +56,7 @@ app.get('/api/tables', (req, res) => {
   const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name = ?;`;
   const params = [keyspace];
 
-  client.execute(query, params)
+  client.execute(query, params, options)
     .then((result) => {
       res.json(result.rows.map(({ table_name }) => table_name));
     })

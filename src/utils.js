@@ -7,7 +7,10 @@ export function objects_equal(obj_a, obj_b) {
   }
 
   for (const key of keys_obj_a) {
-    if (obj_a[key] !== obj_b[key]) {
+    let obj_a_val = obj_a[key] ?? "";
+    let obj_b_val = obj_b[key] ?? "";
+
+    if (obj_a_val !== obj_b_val) {
       return false;
     }
   }

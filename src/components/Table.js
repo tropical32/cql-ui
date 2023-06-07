@@ -1,8 +1,8 @@
 import classNames from "classnames";
 
-import { objects_equal } from "../utils.js";
-
 import "./Table.css";
+
+import { objects_equal } from "../utils.js";
 
 export default function Table({ 
   data = {}, 
@@ -32,8 +32,16 @@ export default function Table({
     <table key={name} className="table">
       <thead>
         <tr>
-          {columns.map((key) => (
-            <td key={key}>{key}</td>
+          {columns.map(({ column_name, kind }) => (
+            <td 
+              className={classNames({ 
+                "partition-key": kind === "partition_key",
+                "clustering-key": kind === "clustering",
+              })} 
+              key={column_name}
+            >
+              {column_name}
+            </td>
           ))}
         <td />
         </tr>
@@ -42,14 +50,15 @@ export default function Table({
         {Object.entries(add_rows).map(([order, entry]) => {
           return (
             <tr key={"addable-" + order} className="addable">
-              {columns.map((key) => {
-                let value = entry[key];
+              {columns.map(({ column_name, kind }) => {
+                let value = entry[column_name];
 
-                return <td key={"addable-" + key + name}>
+                return <td key={"addable-" + column_name + name}>
                   <input 
-                    onChange={event => update_addable_table_entry(order, key, event.target.value)} 
+                    onChange={event => update_addable_table_entry(order, column_name, event.target.value)} 
                     className="table-input" 
-                    value={value} 
+                    value={value ?? ""} 
+                    placeholder="null"
                   />
                 </td>;
               })}
@@ -77,13 +86,15 @@ export default function Table({
                 "pending-del": is_pending_deletion,
               })}
             >
-              {columns.map((key) => {
-                let value = entry[key];
+              {columns.map(({ column_name, kind }) => {
+                let value = entry[column_name];
 
-                return <td key={order + key + name}>
+                return <td key={order + column_name + name}>
                   <input 
-                    onChange={event => update_table_entry(order, key, event.target.value)} 
-                    className="table-input" value={value} 
+                    onChange={event => update_table_entry(order, column_name, event.target.value)} 
+                    className="table-input" 
+                    value={value ?? ""}
+                    placeholder="null"
                   />
                 </td>;
               })}

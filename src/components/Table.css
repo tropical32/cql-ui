@@ -2,7 +2,11 @@
   font-weight: 500;
 }
 
-.table > thead > tr > td.primary-key {
+.table > thead > tr > td.partition-key {
+  color: tomato;
+}
+
+.table > thead > tr > td.clustering-key {
   color: cornflowerblue;
 }
 

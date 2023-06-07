@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
+import { objects_equal } from "./utils.js";
+
 import Table from "./components/Table.js";
 import TableSelector from "./components/TableSelector.js";
 import SaveButton from "./components/SaveButton.js";
@@ -67,6 +69,18 @@ function App() {
     });
   }
 
+  function on_save() {
+    const edited_rows = Object
+      .entries(table_data)
+      .filter(([id, data_row]) => {
+        const shadow_row = table_data_shadow[id];
+        return !objects_equal(data_row, shadow_row);
+      })
+      .map(([id, _]) => id);
+
+    console.log(edited_rows);
+  }
+
   function remove_addable_row(id) {
     let next_addable_rows = { ...add_rows };
     delete next_addable_rows[id];
@@ -131,7 +145,7 @@ function App() {
           set_table_data_shadow({});
           set_rows_to_delete([]);
           set_table_name("");
-          set_table_columns({});
+          set_table_columns([]);
           set_add_rows([]);
 
           let table_name = event.target.value;
@@ -143,7 +157,7 @@ function App() {
           }
         }}
       />
-      <SaveButton />
+      <SaveButton on_save={on_save} />
       <DiscardButton 
         onDiscardChanges={() => {
           set_rows_to_delete([]);
