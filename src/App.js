@@ -10,6 +10,26 @@ import AddButton from "./components/AddButton.js";
 import logo from "./logo.svg";
 import "./App.css";
 
+function get_default_type_value(type) {
+  switch (type) {
+    case "varint":
+    case "tinyint":
+    case "smallint":
+    case "int":
+    case "bigint":
+    case "decimal":
+      return 0;
+    case "timestamp":
+    case "date":
+      return new Date().toISOString();
+    case "float":
+    case "double":
+      return 0.0;
+    case "text":
+      return "";
+  }
+}
+
 function App() {
   let [table_name, set_table_name] = useState("");
   let [tables, set_tables] = useState([]);
@@ -28,8 +48,14 @@ function App() {
     set_rows_to_delete([...rows_to_delete, row]);
   }
 
-  function add_row(row) {
-    set_add_rows([...add_rows, row]);
+  function add_row() {
+    const empty_columns = Object.fromEntries(
+      table_info.columns.map(column => [column.name, get_default_type_value(column.type)])
+    );
+
+    set_add_rows([...add_rows, empty_columns]);
+
+    console.log(add_rows);
   }
 
   function remove_from_to_delete_row(retained_row) {
@@ -89,6 +115,7 @@ function App() {
           set_rows_to_update([]);
           set_table_name("");
           set_table_info({});
+          set_add_rows([]);
 
           let table_name = event.target.value;
 
@@ -104,6 +131,7 @@ function App() {
         onDiscardChanges={() => {
           set_rows_to_delete([]);
           set_rows_to_update([]);
+          set_add_rows([]);
         }} 
       />
       <AddButton is_active={table_name != ""} on_add_row={add_row} />
