@@ -25,3 +25,11 @@
 .table input:disabled {
   background: #F4EDFA;
 }
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  border: 1px solid black;
+}
