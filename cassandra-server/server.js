@@ -71,7 +71,7 @@ app.get('/api/columns/:table', (req, res) => {
     })
     .catch((err) => {
       console.error('Error executing query', err);
-      res.status(500).json({ error: 'Error executing query' });
+      res.status(500).json({ error: err.message });
     });
 });
 
@@ -85,7 +85,7 @@ app.get('/api/tables', (req, res) => {
     })
     .catch((err) => {
       console.error('Error executing query', err);
-      res.status(500).json({ error: 'Error executing query' });
+      res.status(500).json({ error: err.message });
     });
 });
 
