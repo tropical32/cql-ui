@@ -41,14 +41,10 @@ app.get('/api/data/:table', (req, res) => {
       filterParams.push(val);
     });
 
-    console.log(filterConditions);
-
     if (filterConditions.length > 0) {
       query += ` WHERE ${filterConditions.join(' AND ')}`;
     }
   }
-
-  console.log(query, filterParams);
 
   client.execute(query, filterParams, { ...options, prepare: true })
     .then((result) => {
