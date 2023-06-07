@@ -15,6 +15,7 @@ export default function Table({
   remove_addable_row,
   update_table_entry,
   update_addable_table_entry,
+  columns,
 }) {
   if (name === "") {
     return null;
@@ -27,19 +28,11 @@ export default function Table({
     return null;
   }
 
-  let keys = [];
-
-  if (add_rows_len > 0) {
-    keys = Object.keys(Object.values(add_rows)[0]);
-  } else {
-    keys = Object.keys(Object.values(data)[0]);
-  }
-
   return (
     <table key={name} className="table">
       <thead>
         <tr>
-          {keys.map((key) => (
+          {columns.map((key) => (
             <td key={key}>{key}</td>
           ))}
         <td />
@@ -49,7 +42,7 @@ export default function Table({
         {Object.entries(add_rows).map(([order, entry]) => {
           return (
             <tr key={"addable-" + order} className="addable">
-              {keys.map((key) => {
+              {columns.map((key) => {
                 let value = entry[key];
 
                 return <td key={"addable-" + key + name}>
@@ -84,7 +77,7 @@ export default function Table({
                 "changed": is_edited,
               })}
             >
-              {keys.map((key) => {
+              {columns.map((key) => {
                 let value = entry[key];
 
                 return <td key={order + key + name}>

@@ -15,7 +15,7 @@ function App() {
   let [tables, set_tables] = useState([]);
   let [table_data, set_table_data] = useState({});
   let [table_data_shadow, set_table_data_shadow] = useState({});
-  let [table_info, set_table_info] = useState({});
+  let [table_columns, set_table_columns] = useState([]);
   let [error, set_error] = useState(null);
   let [add_rows, set_add_rows] = useState({});
   let [rows_to_delete, set_rows_to_delete] = useState([]);
@@ -60,7 +60,7 @@ function App() {
     set_add_rows(curr_add_rows => {
       const next_add_row_counter = increase_add_row_counter();
       const empty_columns = Object.fromEntries(
-        table_info.columns.map(column => [column.name, ""])
+        table_columns.map(column => [column.name, ""])
       );
 
       return {...curr_add_rows, [next_add_row_counter]: empty_columns}
@@ -97,11 +97,11 @@ function App() {
       });
   }
 
-  function fetch_table_info(table_name) {
+  function fetch_table_columns(table_name) {
     axios_instance
-      .get(`/api/info/${table_name}`)
+      .get(`/api/columns/${table_name}`)
       .then((response) => {
-        set_table_info(response.data);
+        set_table_columns(response.data);
         set_error(null);
       })
       .catch((error) => {
@@ -119,7 +119,7 @@ function App() {
       .catch((error) => {
         set_error(error);
       });
-  }, [axios_instance]);
+  }, []);
 
   return (
     <div className="main">
@@ -131,14 +131,14 @@ function App() {
           set_table_data_shadow({});
           set_rows_to_delete([]);
           set_table_name("");
-          set_table_info({});
+          set_table_columns({});
           set_add_rows([]);
 
           let table_name = event.target.value;
 
           if (table_name !== "") {
             set_table_name(table_name);
-            fetch_table_info(table_name);
+            fetch_table_columns(table_name);
             fetch_table_data(table_name);
           }
         }}
@@ -153,6 +153,7 @@ function App() {
       />
       <AddButton is_active={table_name !== ""} on_add_row={add_row} />
       <Table 
+        columns={table_columns}
         update_addable_table_entry={update_addable_table_entry}
         name={table_name}
         data={table_data}
