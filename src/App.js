@@ -51,7 +51,6 @@ function App() {
     axios_instance
       .get(`/api/info/${table_name}`)
       .then((response) => {
-        console.log(response);
         set_table_info(response.data);
       })
       .catch((error) => {
@@ -79,8 +78,12 @@ function App() {
       <TableSelector
         tables={tables}
         onChange={(event) => {
+          set_table_data([]);
           set_rows_to_delete([]);
           set_rows_to_update([]);
+          set_table_name("");
+          set_table_info({});
+
           set_table_name(event.target.value);
           fetch_table_info(event.target.value);
           fetch_table_data(event.target.value);

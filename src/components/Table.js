@@ -11,7 +11,12 @@ export default function Table({
   remove_from_to_delete_row,
   rows_to_delete = [],
 }) {
-  if (data.length == 0 || columns.length == 0 || primary_key.length == 0) {
+  if (
+    data.length == 0 
+    || columns.length == 0 
+    || primary_key.length == 0 
+    || name == ''
+  ) {
     return null;
   }
 
@@ -37,14 +42,14 @@ export default function Table({
 
           return (
             <tr 
-              key={primary_key.map(pk => entry[pk]).join(",")}
+              key={primary_key.map(pk => entry[pk]).join(",") + name}
               className={is_pending_deletion ? "pending-del" : ""}
             >
               {keys.map((key) => {
                 let value = entry[key];
 
                 return <td 
-                  key={primary_key.map(pk => entry[pk]).join(",") + key}
+                  key={primary_key.map(pk => entry[pk]).join(",") + key + name}
                 >
                   <input className="table-input" value={value} />
                 </td>;
