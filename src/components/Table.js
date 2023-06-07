@@ -76,7 +76,7 @@ export default function Table({
                     <input 
                       onChange={event => update_addable_table_entry(order, column_name, event.target.value)} 
                       className="table-input" 
-                      value={value ?? ""} 
+                      value={value} 
                       placeholder="null"
                       type={is_text_input || is_timestamp_input ? "text" : "number"}
                     />
@@ -131,7 +131,7 @@ export default function Table({
                     <input 
                       onChange={event => update_table_entry(order, column_name, event.target.value)} 
                       className="table-input" 
-                      value={value ?? ""}
+                      value={value}
                       placeholder="null"
                       disabled={is_clustering_key || is_partition_key}
                       type={is_text_input || is_timestamp_input ? "text" : "number"}
