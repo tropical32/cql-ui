@@ -33,6 +33,7 @@ cql-ui is a web-based interface for interacting with CQL databases like Cassandr
 1. Install client dependencies
 
     ```
+    cd ./cql-ui
     npm install
     ```
 
