@@ -55,3 +55,21 @@ cql-ui is a web-based interface for interacting with CQL databases like Cassandr
 * Press "Save" to save the changes
 * Press "Add" to add a new editable row
 * Press "Discard" to discard all changes made to a table
+
+### Possibilities
+
+* Can choose keyspaces
+* Can choose tables
+* Can CRUD existing tables (Create, Read, Update, Delete data)
+* Can filter data by fields
+* Performs operations as a single transaction
+* Displays errors
+
+### Limitations
+* Cannot create tables
+* Cannot create indexes
+* Cannot paginate data
+* Cannot order data
+* Cannot create backups
+* Cannot scale databases
+* Cannot monitor the database
