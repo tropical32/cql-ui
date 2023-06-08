@@ -44,5 +44,5 @@ export default function Filters({ tableColumns, onSubmit }) {
 
 Filters.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-  tableColumns: PropTypes.arrayOf().isRequired,
+  tableColumns: PropTypes.arrayOf(PropTypes.shape).isRequired,
 };

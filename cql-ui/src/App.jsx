@@ -168,7 +168,7 @@ function App() {
     setRowsToDelete([]);
     setTableName('');
     setTableColumns([]);
-    setAddRows([]);
+    setAddRows({});
     setTables([]);
 
     if (nextKeyspace !== '') {
@@ -190,7 +190,7 @@ function App() {
     setRowsToDelete([]);
     setTableName('');
     setTableColumns([]);
-    setAddRows([]);
+    setAddRows({});
 
     if (nextTableName !== '') {
       setTableName(nextTableName);
@@ -201,7 +201,7 @@ function App() {
 
   function onDiscardChanges() {
     setRowsToDelete([]);
-    setAddRows([]);
+    setAddRows({});
     copyShadowRowsToRows();
   }
 

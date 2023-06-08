@@ -16,6 +16,6 @@ export default function KeyspaceSelector({ keyspaces, onChange }) {
 }
 
 KeyspaceSelector.propTypes = {
-  keyspaces: PropTypes.arrayOf().isRequired,
+  keyspaces: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func.isRequired,
 };

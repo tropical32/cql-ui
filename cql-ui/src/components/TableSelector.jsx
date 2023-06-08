@@ -16,6 +16,6 @@ export default function TableSelector({ tables, onChange }) {
 }
 
 TableSelector.propTypes = {
-  tables: PropTypes.arrayOf.isRequired,
+  tables: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func.isRequired,
 };

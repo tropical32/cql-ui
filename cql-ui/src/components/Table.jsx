@@ -185,15 +185,15 @@ export default function Table({
 }
 
 Table.propTypes = {
-  data: PropTypes.objectOf().isRequired,
-  dataShadow: PropTypes.objectOf().isRequired,
+  data: PropTypes.shape().isRequired,
+  dataShadow: PropTypes.shape().isRequired,
   name: PropTypes.string.isRequired,
   addToDeleteRow: PropTypes.func.isRequired,
   removeFromToDeleteRow: PropTypes.func.isRequired,
-  rowsToDelete: PropTypes.arrayOf().isRequired,
-  addRows: PropTypes.arrayOf().isRequired,
+  rowsToDelete: PropTypes.arrayOf(PropTypes.shape).isRequired,
+  addRows: PropTypes.objectOf(PropTypes.shape).isRequired,
   removeAddableRow: PropTypes.func.isRequired,
   updateTableEntry: PropTypes.func.isRequired,
   updateAddableTableEntry: PropTypes.func.isRequired,
-  columns: PropTypes.arrayOf().isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape).isRequired,
 };
