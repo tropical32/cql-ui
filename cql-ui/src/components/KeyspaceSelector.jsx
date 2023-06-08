@@ -5,7 +5,8 @@ export default function KeyspaceSelector({ keyspaces, onChange }) {
   return (
     <div>
       <label htmlFor="keyspaces">
-        Keyspace:
+        Keyspace
+        {': '}
         <select id="keyspaces" name="keyspaces" onChange={(event) => onChange(event.target.value)}>
           <option aria-label="<empty>" />
           {keyspaces.map((table) => <option key={table} value={table}>{table}</option>)}
