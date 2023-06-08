@@ -29,7 +29,7 @@ function App() {
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
   const axiosInstance = axios.create({
-    baseURL: 'http://127.0.0.1:7777',
+    baseURL: process.env.REACT_APP_MIDDLEWARE_HOST || 'http://127.0.0.1:7777',
   });
 
   function copyShadowRowsToRows() {
