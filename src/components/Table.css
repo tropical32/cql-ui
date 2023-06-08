@@ -1,0 +1,47 @@
+.table thead tr td {
+  font-weight: 500;
+}
+
+.table > thead > tr > td.partition-key {
+  color: tomato;
+}
+
+.table > thead > tr > td.clustering-key {
+  color: cornflowerblue;
+}
+
+.table > tbody > tr.addable > td {
+  background: #90EE90;
+}
+
+.table > tbody > tr.addable > td > input {
+  background: #90EE90;
+}
+
+.table > tbody > tr.changed > td {
+  background: #F7DF8D;
+}
+
+.table > tbody > tr.changed > td > input {
+  background: #F7DF8D;
+}
+
+.table > tbody > tr.pending-del > td {
+  background: #F5A69C;
+}
+
+.table > tbody > tr.pending-del > td > input {
+  background: #F5A69C;
+}
+
+.table input:disabled {
+  background: #F4EDFA;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  border: 1px solid black;
+}

@@ -1,0 +1,15 @@
+.main {
+  margin: 10px;
+}
+
+.error {
+  color: red;
+}
+
+.buttons-group {
+  margin: 10px 0;
+}
+
+.buttons-group > button {
+  margin-right: 10px;
+}
