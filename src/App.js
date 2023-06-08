@@ -69,7 +69,7 @@ function App() {
         table_columns.map(({ column_name }) => [column_name, ""])
       );
 
-      return {...curr_add_rows, [next_add_row_counter]: empty_columns}
+      return { ...curr_add_rows, [next_add_row_counter]: empty_columns }
     });
   }
 
@@ -94,7 +94,7 @@ function App() {
 
     if (edited_rows.length > 0 || add_rows_array.length > 0 || rows_to_delete.length > 0) {
       axios_instance
-        .post(`/api/data/${table_name}`, {...data, keyspace: keyspace.current })
+        .post(`/api/data/${table_name}`, { ...data, keyspace: keyspace.current })
         .then(update_table_data_on_success)
         .catch(err => set_error(err));
     }
@@ -189,7 +189,7 @@ function App() {
     if (next_keyspace !== "") {
       console.log("fetching");
       axios_instance
-        .get("/api/tables", { params: { keyspace: keyspace.current } } )
+        .get("/api/tables", { params: { keyspace: keyspace.current } })
         .then((response) => {
           set_tables(response.data);
           set_error(null);
@@ -237,19 +237,19 @@ function App() {
       />
       <div className="buttons-group">
         <SaveButton on_save={on_save} />
-        <DiscardButton 
+        <DiscardButton
           onDiscardChanges={() => {
             set_rows_to_delete([]);
             set_add_rows([]);
             copy_shadow_rows_to_rows();
-          }} 
+          }}
         />
         <AddButton is_active={table_name !== ""} on_add_row={add_row} />
       </div>
       <div className="buttons-group">
         <Filters table_columns={table_columns} on_submit={on_filter_submit} />
       </div>
-      <Table 
+      <Table
         columns={table_columns}
         update_addable_table_entry={update_addable_table_entry}
         name={table_name}
