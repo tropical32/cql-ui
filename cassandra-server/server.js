@@ -4,15 +4,18 @@ const { Client } = require('cassandra-driver');
 const cors = require('cors');
 
 const app = express();
-const port = 7777;
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const contact_points = [process.env.NODE_CONTACT_POINT];
+const local_data_center = process.env.LOCAL_DATA_CENTER || "datacenter1";
+const server_port = process.env.SERVER_PORT || 7777;
+
 const client = new Client({
-  contactPoints: ['172.18.0.7'],
-  localDataCenter: 'datacenter1',
+  contactPoints: contact_points,
+  localDataCenter: local_data_center,
 });
 const options = { fetchSize: 200 };
 
@@ -166,6 +169,6 @@ app.post('/api/data/:table', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(server_port, () => {
+  console.log(`Server running on port ${server_port}`);
 });
