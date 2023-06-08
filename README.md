@@ -40,10 +40,10 @@ cql-ui is a web-based interface for interacting with CQL databases like Cassandr
 2. Start the client
 
     ```
-    npm start
+    REACT_APP_MIDDLEWARE_HOST=http://127.0.0.1:7777 npm start
     ```
 
-    This will start the cql-ui client on your local development server.
+    This will start the cql-ui client on your local development server. Make sure the host flag points to the previously created server.
 
 ### Usage
 
