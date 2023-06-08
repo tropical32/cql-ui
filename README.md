@@ -66,9 +66,10 @@ cql-ui is a web-based interface for interacting with CQL databases like Cassandr
 * Displays errors
 
 ### Limitations
+* Cannot create tables
+* Cannot create indexes
 * Cannot paginate data
 * Cannot order data
-* Cannot add indexes
 * Cannot create backups
 * Cannot scale databases
 * Cannot monitor the database
