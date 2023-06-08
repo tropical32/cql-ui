@@ -4,6 +4,7 @@ import axios from "axios";
 import { objects_equal } from "./utils.js";
 
 import Table from "./components/Table.js";
+import KeyspaceSelector from "./components/KeyspaceSelector.js";
 import TableSelector from "./components/TableSelector.js";
 import SaveButton from "./components/SaveButton.js";
 import DiscardButton from "./components/DiscardButton.js";
@@ -14,6 +15,8 @@ import "./App.css";
 
 function App() {
   let row_counter = useRef(0);
+  let keyspace = useRef("");
+  let [keyspaces, set_keyspaces] = useState([]);
   let [table_name, set_table_name] = useState("");
   let [tables, set_tables] = useState([]);
   let [table_data, set_table_data] = useState({});
@@ -91,7 +94,7 @@ function App() {
 
     if (edited_rows.length > 0 || add_rows_array.length > 0 || rows_to_delete.length > 0) {
       axios_instance
-        .post(`/api/data/${table_name}`, data)
+        .post(`/api/data/${table_name}`, {...data, keyspace: keyspace.current })
         .then(update_table_data_on_success)
         .catch(err => set_error(err));
     }
@@ -122,7 +125,7 @@ function App() {
 
   function fetch_table_data(table_name, query_params) {
     axios_instance
-      .get(`/api/data/${table_name}`, { params: query_params })
+      .get(`/api/data/${table_name}`, { params: { ...query_params, keyspace: keyspace.current } })
       .then((response) => {
         let rows_stringified = response.data.map(row => Object.fromEntries(
           Object.entries(row).map(([col, val]) => ([col, val == null ? null : val.toString()]))
@@ -143,7 +146,7 @@ function App() {
 
   function fetch_table_columns(table_name) {
     axios_instance
-      .get(`/api/columns/${table_name}`)
+      .get(`/api/columns/${table_name}`, { params: { keyspace: keyspace.current } })
       .then((response) => {
         set_table_columns(response.data);
         set_error(null);
@@ -171,24 +174,51 @@ function App() {
     fetch_table_data(table_name, { filters: filter_values });
   }
 
+  function on_keyspace_changed(event) {
+    let next_keyspace = event.target.value;
+    keyspace.current = next_keyspace;
+
+    set_table_data({});
+    set_table_data_shadow({});
+    set_rows_to_delete([]);
+    set_table_name("");
+    set_table_columns([]);
+    set_add_rows([]);
+    set_tables([]);
+
+    if (next_keyspace !== "") {
+      console.log("fetching");
+      axios_instance
+        .get("/api/tables", { params: { keyspace: keyspace.current } } )
+        .then((response) => {
+          set_tables(response.data);
+          set_error(null);
+        })
+        .catch((error) => {
+          set_error(error);
+        });
+    }
+  }
+
   useEffect(() => {
     axios_instance
-      .get("/api/tables")
+      .get("/api/keyspaces")
       .then((response) => {
-        set_tables(response.data);
-        set_error(null);
+        set_keyspaces(response.data);
       })
       .catch((error) => {
         set_error(error);
       });
+
   }, []);
 
   return (
     <div className="main">
       {error && <div className="error">{error?.response?.data?.error}</div>}
+      <KeyspaceSelector on_change={on_keyspace_changed} keyspaces={keyspaces} />
       <TableSelector
         tables={tables}
-        onChange={(event) => {
+        on_change={(event) => {
           set_table_data({});
           set_table_data_shadow({});
           set_rows_to_delete([]);

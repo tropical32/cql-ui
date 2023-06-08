@@ -5,7 +5,6 @@ const cors = require('cors');
 
 const app = express();
 const port = 7777;
-const keyspace = 'ks';
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,7 +13,6 @@ app.use(bodyParser.json());
 const client = new Client({
   contactPoints: ['172.18.0.7'],
   localDataCenter: 'datacenter1',
-  keyspace: keyspace,
 });
 const options = { fetchSize: 200 };
 
@@ -27,8 +25,9 @@ client.connect()
   });
 
 app.get('/api/data/:table', (req, res) => {
+  const keyspace = req.query.keyspace || req.body.keyspace;
   const table = req.params.table;
-  let query = `SELECT * FROM ${table}`;
+  let query = `SELECT * FROM ${keyspace}.${table}`;
 
   const filters = req.query.filters || req.body.filters;
   const filterParams = [];
@@ -57,6 +56,7 @@ app.get('/api/data/:table', (req, res) => {
 });
 
 app.get('/api/columns/:table', (req, res) => {
+  const keyspace = req.query.keyspace || req.body.keyspace;
   const table = req.params.table;
   const query = `SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
   const params = [keyspace, table];
@@ -73,6 +73,7 @@ app.get('/api/columns/:table', (req, res) => {
 
 app.get('/api/tables', (req, res) => {
   const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name = ?;`;
+  const keyspace = req.query.keyspace || req.body.keyspace;
   const params = [keyspace];
 
   client.execute(query, params, options)
@@ -85,7 +86,22 @@ app.get('/api/tables', (req, res) => {
     });
 });
 
+app.get('/api/keyspaces', (req, res) => {
+  const query = `SELECT keyspace_name FROM system_schema.keyspaces`;
+
+  client.execute(query, [], options)
+    .then((result) => {
+      console.log(result);
+      res.json(result.rows.map(({ keyspace_name }) => keyspace_name));
+    })
+    .catch((err) => {
+      console.error('Error executing query', err);
+      res.status(500).json({ error: err.message });
+    });
+});
+
 app.post('/api/data/:table', (req, res) => {
+  const keyspace = req.query.keyspace || req.body.keyspace;
   const table = req.params.table;
   const query = `SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
   const params = [keyspace, table];
