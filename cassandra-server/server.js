@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Client } = require('cassandra-driver');
@@ -9,13 +10,13 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const contact_points = [process.env.NODE_CONTACT_POINT];
-const local_data_center = process.env.LOCAL_DATA_CENTER || "datacenter1";
-const server_port = process.env.SERVER_PORT || 7777;
+const contactPoints = [process.env.NODE_CONTACT_POINT];
+const localDataCenter = process.env.LOCAL_DATA_CENTER || 'datacenter1';
+const serverPort = process.env.SERVER_PORT || 7777;
 
 const client = new Client({
-  contactPoints: contact_points,
-  localDataCenter: local_data_center,
+  contactPoints,
+  localDataCenter,
 });
 const options = { fetchSize: 200 };
 
@@ -29,7 +30,7 @@ client.connect()
 
 app.get('/api/data/:table', (req, res) => {
   const keyspace = req.query.keyspace || req.body.keyspace;
-  const table = req.params.table;
+  const { table } = req.params;
   let query = `SELECT * FROM ${keyspace}.${table}`;
 
   const filters = req.query.filters || req.body.filters;
@@ -38,7 +39,7 @@ app.get('/api/data/:table', (req, res) => {
   if (filters) {
     const filterConditions = [];
 
-    Object.entries(filters).map(([col, val]) => {
+    Object.entries(filters).forEach(([col, val]) => {
       filterConditions.push(`${col} = ?`);
       filterParams.push(val);
     });
@@ -60,8 +61,8 @@ app.get('/api/data/:table', (req, res) => {
 
 app.get('/api/columns/:table', (req, res) => {
   const keyspace = req.query.keyspace || req.body.keyspace;
-  const table = req.params.table;
-  const query = `SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
+  const { table } = req.params;
+  const query = 'SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;';
   const params = [keyspace, table];
 
   client.execute(query, params, options)
@@ -75,13 +76,13 @@ app.get('/api/columns/:table', (req, res) => {
 });
 
 app.get('/api/tables', (req, res) => {
-  const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name = ?;`;
+  const query = 'SELECT table_name FROM system_schema.tables WHERE keyspace_name = ?;';
   const keyspace = req.query.keyspace || req.body.keyspace;
   const params = [keyspace];
 
   client.execute(query, params, options)
     .then((result) => {
-      res.json(result.rows.map(({ table_name }) => table_name));
+      res.json(result.rows.map(({ table_name: tableName }) => tableName));
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -90,12 +91,12 @@ app.get('/api/tables', (req, res) => {
 });
 
 app.get('/api/keyspaces', (req, res) => {
-  const query = `SELECT keyspace_name FROM system_schema.keyspaces`;
+  const query = 'SELECT keyspace_name FROM system_schema.keyspaces';
 
   client.execute(query, [], options)
     .then((result) => {
       console.log(result);
-      res.json(result.rows.map(({ keyspace_name }) => keyspace_name));
+      res.json(result.rows.map(({ keyspace_name: keyspaceName }) => keyspaceName));
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -105,59 +106,62 @@ app.get('/api/keyspaces', (req, res) => {
 
 app.post('/api/data/:table', (req, res) => {
   const keyspace = req.query.keyspace || req.body.keyspace;
-  const table = req.params.table;
-  const query = `SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;`;
+  const { table } = req.params;
+  const query = 'SELECT column_name, kind, type FROM system_schema.columns WHERE keyspace_name = ? AND table_name = ?;';
   const params = [keyspace, table];
 
-  const { edited_rows, added_rows, deleted_rows } = req.body;
+  const { edited_rows: editedRows, added_rows: addedRows, deleted_rows: deletedRows } = req.body;
 
   client.execute(query, params, options)
     .then((result) => {
-      const table_info = result.rows;
-      const key_cols = table_info
-        .filter(({ kind }) => kind === "partition_key" || kind === "clustering")
-        .map(({ column_name }) => column_name);
+      const tableInfo = result.rows;
+      const keyCols = tableInfo
+        .filter(({ kind }) => kind === 'partition_key' || kind === 'clustering')
+        .map(({ column_name: columnName }) => columnName);
 
-      const update_queries = edited_rows.map(row => {
-        const update_set_part = [];
-        const update_where_part = [];
-        const query_params = [];
+      const updateQueries = editedRows.map((row) => {
+        const updateSetPart = [];
+        const updateWherePart = [];
+        const queryParams = [];
 
-        const row_entries = Object.entries(row);
-        const key_pairs = row_entries.filter(([col, val]) => key_cols.includes(col));
-        const regular_pairs = row_entries.filter(([col, val]) => !key_cols.includes(col));
+        const rowEntries = Object.entries(row);
+        const keyPairs = rowEntries.filter(([col]) => keyCols.includes(col));
+        const regularPairs = rowEntries.filter(([col]) => !keyCols.includes(col));
 
-        regular_pairs.forEach(([col, val]) => {
-          update_set_part.push(`${col} = ?`);
-          query_params.push(val || null);
+        regularPairs.forEach(([col, val]) => {
+          updateSetPart.push(`${col} = ?`);
+          queryParams.push(val || null);
         });
 
-        key_pairs.forEach(([col, val]) => {
-          update_where_part.push(`${col} = ?`);
-          query_params.push(val);
+        keyPairs.forEach(([col, val]) => {
+          updateWherePart.push(`${col} = ?`);
+          queryParams.push(val);
         });
 
-        const update_query = `UPDATE ${keyspace}.${table} SET ${update_set_part.join(",")} WHERE ${update_where_part.join(" AND ")};`;
-        return { query: update_query, params: query_params };
+        const updateQuery = `UPDATE ${keyspace}.${table} SET ${updateSetPart.join(',')} WHERE ${updateWherePart.join(' AND ')};`;
+        return { query: updateQuery, params: queryParams };
       });
 
-      const insert_queries = added_rows.map(row => {
-        const col_names = Object.keys(row);
-        const col_vals = Object.values(row);
-        const value_placeholders = col_vals.map(() => '?');
-        const insert_query = `INSERT INTO ${keyspace}.${table} (${col_names.join(", ")}) VALUES (${value_placeholders.join(", ")});`;
-        const insert_params = col_vals.map(val => val || null);
-        return { query: insert_query, params: insert_params };
+      const insertQueries = addedRows.map((row) => {
+        const colNames = Object.keys(row);
+        const colVals = Object.values(row);
+        const valuePlaceholders = colVals.map(() => '?');
+        const insertQuery = `INSERT INTO ${keyspace}.${table} (${colNames.join(', ')}) VALUES (${valuePlaceholders.join(', ')});`;
+        const insertParams = colVals.map((val) => val || null);
+        return { query: insertQuery, params: insertParams };
       });
 
-      const delete_queries = deleted_rows.map(row => {
-        const where_part = key_cols.map(col_name => `${col_name} = ?`);
-        const delete_query = `DELETE FROM ${keyspace}.${table} WHERE ${where_part.join(" AND ")};`;
-        const delete_params = key_cols.map(col_name => row[col_name]);
-        return { query: delete_query, params: delete_params };
+      const deleteQueries = deletedRows.map((row) => {
+        const wherePart = keyCols.map((colName) => `${colName} = ?`);
+        const deleteQuery = `DELETE FROM ${keyspace}.${table} WHERE ${wherePart.join(' AND ')};`;
+        const deleteParams = keyCols.map((colName) => row[colName]);
+        return { query: deleteQuery, params: deleteParams };
       });
 
-      return client.batch([...update_queries, ...insert_queries, ...delete_queries], { prepare: true });
+      return client.batch(
+        [...updateQueries, ...insertQueries, ...deleteQueries],
+        { prepare: true },
+      );
     })
     .then(() => {
       console.log('Data updated on cluster');
@@ -169,6 +173,6 @@ app.post('/api/data/:table', (req, res) => {
     });
 });
 
-app.listen(server_port, () => {
-  console.log(`Server running on port ${server_port}`);
+app.listen(serverPort, () => {
+  console.log(`Server running on port ${serverPort}`);
 });
