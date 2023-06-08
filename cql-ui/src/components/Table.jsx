@@ -76,8 +76,6 @@ export default function Table({
                   </td>
                 );
               }
-              const isTextInput = type === 'text';
-              const isTimestampInput = type === 'timestamp';
 
               return (
                 <td key={`addable-${columnName}${name}`}>
@@ -90,7 +88,7 @@ export default function Table({
                     className="table-input"
                     value={value}
                     placeholder="null"
-                    type={isTextInput || isTimestampInput ? 'text' : 'number'}
+                    type="text"
                   />
                 </td>
               );
@@ -142,8 +140,6 @@ export default function Table({
                     </td>
                   );
                 }
-                const isTextInput = type === 'text';
-                const isTimestampInput = type === 'timestamp';
 
                 return (
                   <td key={order + columnName + name}>
@@ -157,7 +153,7 @@ export default function Table({
                       value={value}
                       placeholder="null"
                       disabled={isClusteringKey || isPartitionKey}
-                      type={isTextInput || isTimestampInput ? 'text' : 'number'}
+                      type="text"
                     />
                   </td>
                 );
