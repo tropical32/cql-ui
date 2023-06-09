@@ -95,7 +95,6 @@ app.get('/api/keyspaces', (req, res) => {
 
   client.execute(query, [], options)
     .then((result) => {
-      console.log(result);
       res.json(result.rows.map(({ keyspace_name: keyspaceName }) => keyspaceName));
     })
     .catch((err) => {
