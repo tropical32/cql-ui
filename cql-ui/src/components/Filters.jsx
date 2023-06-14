@@ -20,6 +20,10 @@ function extractFiltersData(event) {
 }
 
 export default function Filters({ tableColumns, onSubmit }) {
+  if (tableColumns.length === 0) {
+    return null;
+  }
+
   return (
     <div className="filters">
       <form onSubmit={(event) => {
