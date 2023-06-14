@@ -1,12 +1,23 @@
-.table thead tr td {
-  font-weight: 500;
+.table thead {
+  position: sticky;
+  top: 0;
+  border: 1px solid black;
 }
 
-.table > thead > tr > td.partition-key {
+.table thead tr th {
+  font-weight: 500;
+  text-align: left;
+  background-color: #F4EDFA;
+  border: 1px solid black;
+  background-clip: padding-box;
+  padding: 5px;
+}
+
+.table > thead > tr > th.partition-key {
   color: tomato;
 }
 
-.table > thead > tr > td.clustering-key {
+.table > thead > tr > th.clustering-key {
   color: cornflowerblue;
 }
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import './Filters.css';
+
 function extractFiltersData(event) {
   const formElements = event.target.elements;
 
@@ -18,8 +20,12 @@ function extractFiltersData(event) {
 }
 
 export default function Filters({ tableColumns, onSubmit }) {
+  if (tableColumns.length === 0) {
+    return null;
+  }
+
   return (
-    <div>
+    <div className="filters">
       <form onSubmit={(event) => {
         event.preventDefault();
         const filterValues = extractFiltersData(event);
@@ -36,7 +42,11 @@ export default function Filters({ tableColumns, onSubmit }) {
             </label>
           </div>
         ))}
-        <button type="submit">Filter</button>
+        <div className="filter-buttons-group">
+          <button type="submit">Filter</button>
+          {/* eslint-disable-next-line react/button-has-type */}
+          <button type="reset">Reset</button>
+        </div>
       </form>
     </div>
   );

@@ -40,7 +40,7 @@ export default function Table({
       <thead>
         <tr>
           {columns.map(({ column_name: columnName, kind }) => (
-            <td
+            <th
               className={classNames({
                 'partition-key': kind === 'partition_key',
                 'clustering-key': kind === 'clustering',
@@ -48,9 +48,9 @@ export default function Table({
               key={columnName}
             >
               {columnName}
-            </td>
+            </th>
           ))}
-          <td />
+          <th aria-label="delete" />
         </tr>
       </thead>
       <tbody>
