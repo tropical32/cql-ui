@@ -1,0 +1,7 @@
+.filters {
+  border: 1px dotted black;
+}
+
+.filter-buttons-group > button {
+  margin-right: 10px;
+}
