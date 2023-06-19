@@ -70,8 +70,8 @@ export default function Table({
                         event.target.checked,
                       )}
                       className="table-input"
-                      value={value}
-                      checked={value}
+                      value={value === 'true' || value === true}
+                      checked={value === 'true' || value === true}
                     />
                   </td>
                 );
@@ -133,8 +133,8 @@ export default function Table({
                           event.target.checked,
                         )}
                         className="table-input"
-                        value={value}
-                        checked={value}
+                        value={value === 'true' || value === true}
+                        checked={value === 'true' || value === true}
                         disabled={isClusteringKey || isPartitionKey}
                       />
                     </td>
